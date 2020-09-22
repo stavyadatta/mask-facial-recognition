@@ -24,6 +24,7 @@ print("object detections")
 net.setInput(blob)
 detections = net.forward()
 
+
 for i in range(detections.shape[2]):
     confidence = detections[0, 0, i, 2]
     
