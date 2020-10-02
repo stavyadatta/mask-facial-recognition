@@ -4,8 +4,8 @@ import cv2
 
 ap = argparse.ArgumentParser()
 ap.add_argument('-i', '--input', required=True, help='putting in image')
-ap.add_argument('-p', '--prototxt', default='deploy.prototxt.txt')
-ap.add_argument('-m', '--caffemodel', default='res10_300x300_ssd_iter_140000.caffemodel')
+ap.add_argument('-p', '--prototxt', default='detection/deploy.prototxt')
+ap.add_argument('-m', '--caffemodel', default='detection/res10_300x300_ssd_iter_140000.caffemodel')
 ap.add_argument('-c', '--confidence', default=0.5)
 ap.add_argument('-o', '--output', default='output/test.jpg')
 
