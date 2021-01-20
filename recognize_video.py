@@ -1,8 +1,10 @@
+from detect_mask import mask_detection_image
 import numpy as np
 import argparse
 import imutils
 import pickle
 import cv2
+from tensorflow.keras.models import load_model
 import os
 
 ap = argparse.ArgumentParser()
@@ -39,7 +41,7 @@ frame_width = int(vid.get(3))
 frame_height = int(vid.get(4)) 
 print(frame_width, frame_height)
 size = (frame_width, frame_height) 
-out = cv2.VideoWriter('filename.avi',  
+out = cv2.VideoWriter(args['output_video'],  
                         cv2.VideoWriter_fourcc(*'MJPG'), 
                         10, size) 
 
@@ -50,10 +52,20 @@ le = pickle.loads(open(args["le"], "rb").read())
 detector = cv2.dnn.readNetFromCaffe(protoPath, modelPath)
 
 
+prototxtPath = os.path.sep.join(['detection', "deploy.prototxt"])
+weightsPath = os.path.sep.join(['detection',
+                                "res10_300x300_ssd_iter_140000.caffemodel"])
+faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
+
+maskNet = load_model('mask_detector_keras_new_dataset.model')
+i = 0
 while True:
 
-    grabbed, frame = vid.read()
     
+    grabbed, frame = vid.read()
+    i = i + 1
+    print(i)
+    cv2.imwrite(f'images/me{i}.jpg', frame)  
     if not grabbed:
         break
     
@@ -89,6 +101,7 @@ while True:
             preds = recognizer.predict_proba(vec)[0]
             j = np.argmax(preds)
             proba = preds[j]
+            print(proba)
             if proba > 0.5:
                 print((float(proba)) * 100)
                 name = le.classes_[j]
@@ -96,17 +109,21 @@ while True:
                 text = "{}, {:.2f}".format(name, proba * 100)
                 y = startY - 10 if startY - 10 > 10 else startY + 10
                 cv2.rectangle(image, (startX, startY), (endX, endY),
-                            (0, 0, 255), 2)
-                cv2.putText(image, text, (startX + 10, y),
-                            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (0, 0, 255), 2)
-                
+                            (230, 0, 0), 2)
+                cv2.putText(image, text, (startX + 10, y + 220),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.45, (230, 0, 0), 2)
                 
             
-            if args['video']:   
-                image = cv2.resize(image,(width,height))
-            else:
-                image = cv2.resize(image, (640, 480))
-            out.write(image)
+    
+
+    image = mask_detection_image(image, faceNet, maskNet)
+    if args['video']:   
+        image = cv2.resize(image,(width,height))
+    else:
+        image = cv2.resize(image, (640, 480))
+    
+    out.write(image)
+    
 
 cv2.destroyAllWindows()
 

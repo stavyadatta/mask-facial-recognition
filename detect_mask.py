@@ -56,7 +56,7 @@ def mask_detection_video(input_video_path, output_video_path, face_detector="fac
     faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
     
     print("[INFO] loading face mask detector model")
-    maskNet = load_model(model)
+    maskNet  = load_model(model)
     
     print("[INFO] getting video from input")
     vid = cv2.VideoCapture(input_video_path)
@@ -118,17 +118,17 @@ def mask_detection_video(input_video_path, output_video_path, face_detector="fac
     # vid.release()
     cv2.destroyAllWindows()
 
-def mask_detection_image(frame, face_detector="face_detector", model="mask_detector_keras_new_dataset.model"):
+def mask_detection_image(frame, faceNet, maskNet,face_detector="detection", model="mask_detector_keras_new_dataset.model"):
     print("[INFO] loading face detector model")
-    prototxtPath = os.path.sep.join([face_detector, "deploy.prototxt"])
-    weightsPath = os.path.sep.join([face_detector,
-                                    "res10_300x300_ssd_iter_140000.caffemodel"])
-    faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
-    #frame = cv2.imread(frame)
+    # prototxtPath = os.path.sep.join([face_detector, "deploy.prototxt"])
+    # weightsPath = os.path.sep.join([face_detector,
+    #                                 "res10_300x300_ssd_iter_140000.caffemodel"])
+    # faceNet = cv2.dnn.readNet(prototxtPath, weightsPath)
+    # #frame = cv2.imread(frame)
     
-    print("[INFO] loading face mask detector model")
-    maskNet = load_model(model)
-    frame = imutils.resize(frame, width = 400)
+    # print("[INFO] loading face mask detector model")
+    # maskNet = load_model(model)
+    # frame = imutils.resize(frame, width = 400)
     
     (locs, preds) = detect_and_predict_mask(frame, faceNet, maskNet)
     if locs == None and preds == None:
